@@ -12,9 +12,11 @@ require "capistrano-git-methods/version"
 Capistrano::Configuration.instance.load do
 
   #
-  # Sets some default values, if they have not been set
+  # Checks that the requirements are fullfilled
   #
-  _cset :branch, "master"
+  _cset :branch { "You must define a git branch with `set :branch, 'branch_name'`" }
+  _cset :repository { "You must define a git repository with `set :branch, 'branch_name'`" }
+  _cset :latest_release { "You must define the path to the latest release to use this namespace" }
 
   namespace :git do
 
@@ -26,10 +28,11 @@ Capistrano::Configuration.instance.load do
     #
     desc "Setup your git-based deployment app"
     task :setup, :except => { :no_release => true } do
+      puts "\n\nSetting up the remote git target...\n\n"
       dirs = [deploy_to, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
       run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
-      run "git clone #{repository} #{current_path}"
+      run "git clone #{repository} #{latest_release}"
     end
 
     #
@@ -38,7 +41,7 @@ Capistrano::Configuration.instance.load do
     #
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
-      run "cd #{current_path}; git fetch origin; git reset --hard #{branch}"
+      run "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
     end
 
     desc "Moves the repo back to the previous version of HEAD"
@@ -48,7 +51,7 @@ Capistrano::Configuration.instance.load do
 
     desc "Rewrite reflog so HEAD@{1} will continue to point to at the next previous release."
     task :cleanup, :except => { :no_release => true } do
-      run "cd #{current_path}; git reflog delete --rewrite HEAD@{1}; git reflog delete --rewrite HEAD@{1}"
+      run "cd #{latest_release}; git reflog delete --rewrite HEAD@{1}; git reflog delete --rewrite HEAD@{1}"
     end
   end
 end
