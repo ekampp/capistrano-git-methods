@@ -11,21 +11,9 @@ require "capistrano-git-methods/version"
 #
 Capistrano::Configuration.instance.load do
 
-  #
-  # Checks that the requirements are fullfilled
-  #
-  _cset :branch { "You must define a git branch with `set :branch, 'branch_name'`" }
-  _cset :repository { "You must define a git repository with `set :branch, 'branch_name'`" }
-  _cset :latest_release { "You must define the path to the latest release to use this namespace" }
-
   namespace :git do
+    set(:branch) { "master" }
 
-    #
-    # Clones the repository onto the remote server.
-    #
-    # This is required before you can run the <tt>update_code</tt> method
-    # successfully.
-    #
     desc "Setup your git-based deployment app"
     task :setup, :except => { :no_release => true } do
       puts "\n\nSetting up the remote git target...\n\n"
@@ -35,10 +23,6 @@ Capistrano::Configuration.instance.load do
       run "git clone #{repository} #{latest_release}"
     end
 
-    #
-    # Updates the remote code to the latest head of the selected
-    # git branch.
-    #
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
       run "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
