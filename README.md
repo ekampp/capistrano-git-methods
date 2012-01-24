@@ -1,4 +1,4 @@
-# Capistrano git methods
+# Capistrano Git Methods [![Build Status](https://secure.travis-ci.org/ekampp/capistrano-git-methods.png)](http://travis-ci.org/ekampp/capistrano-git-methods)
 
 This is a namespace containing methods for maintaining a remote server through git instead of the standard capistrano way.
 
