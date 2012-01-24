@@ -10,6 +10,12 @@ require "capistrano-git-methods/version"
 # already be available in the standard capistrano deploy scheme.
 #
 Capistrano::Configuration.instance.load do
+
+  #
+  # Sets some default values, if they have not been set
+  #
+  _cset :branch, "master"
+
   namespace :git do
 
     #
