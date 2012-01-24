@@ -1,7 +1,7 @@
 module Capistrano
   module Git
     module Methods
-      VERSION = "0.0.3.alpha"
+      VERSION = "0.0.3"
     end
   end
 end
