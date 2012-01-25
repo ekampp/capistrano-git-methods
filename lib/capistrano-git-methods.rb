@@ -9,14 +9,13 @@ require "capistrano-git-methods/version"
 # This requires the <tt>current_path</tt> variable to be present. This should
 # already be available in the standard capistrano deploy scheme.
 #
-Capistrano::Configuration.instance.load do
+Capistrano::Configuration.instance(true).load do
 
   namespace :git do
     set(:branch) { "master" }
 
     desc "Setup your git-based deployment app"
     task :setup, :except => { :no_release => true } do
-      puts "\n\nSetting up the remote git target...\n\n"
       dirs = [deploy_to, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
       run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
@@ -25,7 +24,16 @@ Capistrano::Configuration.instance.load do
 
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
-      run "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
+      run "cd #{latest_release}; git fetch origin; git reset --hard #{branch}" do |c, s, d|
+        case s.to_s
+        when "err"
+          if d.to_s.include?("From ") or d.to_s.include?("->") # Assumes non-errors
+            logger.important "[#{c[:host]}] #{d}"
+          end
+        when "out"
+          logger.important "[#{c[:host]}] #{d}"
+        end
+      end
     end
 
     desc "Moves the repo back to the previous version of HEAD"
