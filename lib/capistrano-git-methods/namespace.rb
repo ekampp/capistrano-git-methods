@@ -1,6 +1,7 @@
 Capistrano::Configuration.instance.load do
   namespace :git do
-    set(:branch) { "master" }
+    set(:branch)  { "master" }
+    set(:tag)     { nil }
 
     desc "Setup your git-based deployment app"
     task :setup, :except => { :no_release => true } do
@@ -12,7 +13,9 @@ Capistrano::Configuration.instance.load do
 
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
-      run "cd #{latest_release}; git fetch origin; git reset --hard #{branch}" do |c, s, d|
+      git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
+      git_cmd << "; git checkout #{tag}" if tag.present?
+      run git_cmd do |c, s, d|
         case s.to_s
         when "err"
           if d.to_s.include?("From ") or d.to_s.include?("->") # Assumes non-errors
