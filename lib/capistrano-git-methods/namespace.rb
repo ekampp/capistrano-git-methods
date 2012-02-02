@@ -14,7 +14,7 @@ Capistrano::Configuration.instance.load do
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
       git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
-      git_cmd << "; git checkout #{tag}" if tag.present?
+      git_cmd << "; git checkout #{tag}" unless tag.blank?
       run git_cmd do |c, s, d|
         case s.to_s
         when "err"
