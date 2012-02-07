@@ -8,7 +8,9 @@ Capistrano::Configuration.instance.load do
       dirs = [deploy_to, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
       run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
-      run "git clone #{repository} #{latest_release}"
+      run "git clone #{repository} #{latest_release}" do |channel, stream, data|
+        logger.debug "[#{channel[:hoost]}] #{data}"
+      end
     end
 
     desc "Update the deployed code."
