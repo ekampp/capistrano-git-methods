@@ -17,15 +17,8 @@ Capistrano::Configuration.instance.load do
     task :update_code, :except => { :no_release => true } do
       git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard #{branch}"
       git_cmd << "; git checkout #{tag}" unless tag.to_s.length > 0
-      run git_cmd do |c, s, d|
-        case s.to_s
-        when "err"
-          if d.to_s.include?("From ") or d.to_s.include?("->") # Assumes non-errors
-            logger.important "[#{c[:host]}] #{d}"
-          end
-        when "out"
-          logger.important "[#{c[:host]}] #{d}"
-        end
+      run git_cmd do |channel, stream, data|
+        logger.debug "[#{channel[:host]}] #{data}"
       end
     end
 
