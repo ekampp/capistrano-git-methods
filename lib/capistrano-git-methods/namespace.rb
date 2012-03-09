@@ -15,7 +15,6 @@ Capistrano::Configuration.instance.load do
 
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
-      logger.info "Resetting git to #{fetch(:branch)}"
       git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard #{fetch(:branch)}"
       git_cmd << "; git checkout #{tag}" if tag.to_s.length > 0
       run git_cmd do |channel, stream, data|
