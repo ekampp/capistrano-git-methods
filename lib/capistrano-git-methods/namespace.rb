@@ -8,18 +8,14 @@ Capistrano::Configuration.instance.load do
       dirs = [deploy_to, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
       run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
-      run "git clone #{repository} #{latest_release}" do |channel, stream, data|
-        logger.debug "[#{channel[:hoost]}] #{data}"
-      end
+      run "git clone #{repository} #{latest_release}"
     end
 
     desc "Update the deployed code."
     task :update_code, :except => { :no_release => true } do
-      git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard #{fetch(:branch)}"
+      git_cmd = "cd #{latest_release}; git fetch origin; git reset --hard origin/#{fetch(:branch)}"
       git_cmd << "; git checkout #{tag}" if tag.to_s.length > 0
-      run git_cmd do |channel, stream, data|
-        logger.debug "[#{channel[:host]}] #{data}"
-      end
+      run git_cmd
     end
 
     desc "Moves the repo back to the previous version of HEAD"
